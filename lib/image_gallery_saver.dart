@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class ImageGallerySaver {
   static const MethodChannel _channel =
-      const MethodChannel('image_gallery_saver');
+  const MethodChannel('image_gallery_saver');
 
   /// save image to Gallery
   /// imageBytes can't null
@@ -12,13 +12,15 @@ class ImageGallerySaver {
   /// for example:{"isSuccess":true, "filePath":String?}
   static FutureOr<dynamic> saveImage(Uint8List imageBytes,
       {int quality = 80,
-      String? name,
-      bool isReturnImagePathOfIOS = false}) async {
+        String? name,
+        bool isReturnImagePathOfIOS = false,
+        String album = ""}) async {
     final result =
-        await _channel.invokeMethod('saveImageToGallery', <String, dynamic>{
+    await _channel.invokeMethod('saveImageToGallery', <String, dynamic>{
       'imageBytes': imageBytes,
       'quality': quality,
       'name': name,
+      'album': album,
       'isReturnImagePathOfIOS': isReturnImagePathOfIOS
     });
     return result;
