@@ -3,15 +3,12 @@ package com.example.imagegallerysaver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.webkit.MimeTypeMap
-import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -26,13 +23,13 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var methodChannel: MethodChannel
     private var applicationContext: Context? = null
 
-    override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         this.applicationContext = binding.applicationContext
         methodChannel = MethodChannel(binding.binaryMessenger, "image_gallery_saver")
         methodChannel.setMethodCallHandler(this)
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result): Unit {
+    override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "saveImageToGallery" -> {
                 val image = call.argument<ByteArray?>("imageBytes")
@@ -42,11 +39,7 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
 
                 result.success(
                     saveImageToGallery(
-                        BitmapFactory.decodeByteArray(
-                            image ?: ByteArray(0),
-                            0,
-                            image?.size ?: 0
-                        ), quality, name, album ?: ""
+                        image, quality, name, album ?: ""
                     )
                 )
             }
@@ -61,9 +54,9 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         applicationContext = null
-        methodChannel.setMethodCallHandler(null);
+        methodChannel.setMethodCallHandler(null)
     }
 
     private fun generateUri(
@@ -87,7 +80,7 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
                 put(
                     MediaStore.MediaColumns.RELATIVE_PATH, when {
                         isVideo -> Environment.DIRECTORY_MOVIES
-                        else -> Environment.DIRECTORY_PICTURES + if(album.isNotEmpty()) "/$album" else ""
+                        else -> Environment.DIRECTORY_PICTURES + if (album.isNotEmpty()) "/$album" else ""
                     }
                 )
                 if (!TextUtils.isEmpty(mimeType)) {
@@ -151,7 +144,7 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun saveImageToGallery(
-        bmp: Bitmap?,
+        bmp: ByteArray?,
         quality: Int?,
         name: String?,
         album: String = ""
@@ -172,7 +165,7 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
                 fos = context.contentResolver.openOutputStream(fileUri)
                 if (fos != null) {
                     println("ImageGallerySaverPlugin $quality")
-                    bmp.compress(Bitmap.CompressFormat.JPEG, quality, fos)
+                    fos.write(bmp)
                     fos.flush()
                     success = true
                 }
@@ -181,7 +174,6 @@ class ImageGallerySaverPlugin : FlutterPlugin, MethodCallHandler {
             SaveResultModel(false, null, e.toString()).toHashMap()
         } finally {
             fos?.close()
-            bmp.recycle()
         }
         return if (success) {
             sendBroadcast(context, fileUri)

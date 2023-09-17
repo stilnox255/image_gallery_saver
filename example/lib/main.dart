@@ -49,14 +49,18 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               SizedBox(height: 15),
               RepaintBoundary(
-                key: _globalKey,
-                child: Container(
-                  alignment: Alignment.center,
-                  width: 300,
-                  height: 300,
-                  color: Colors.blue,
-                ),
-              ),
+                  key: _globalKey,
+                  child: Stack(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        width: 300,
+                        height: 300,
+                        color: Colors.blue,
+                      ),
+                      Text("fooo")
+                    ],
+                  )),
               Container(
                 padding: EdgeInsets.only(top: 15),
                 child: ElevatedButton(
