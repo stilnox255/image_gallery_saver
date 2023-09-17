@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -56,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         alignment: Alignment.center,
                         width: 300,
                         height: 300,
-                        color: Colors.blue,
+                        color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
                       ),
                       Text("fooo")
                     ],
